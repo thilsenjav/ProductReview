@@ -6,7 +6,7 @@ import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 
 @RunWith(Cucumber.class)
-@CucumberOptions(features="classpath:com.demo.product.review.integration",tags= {"@registration"},plugin= {"pretty"})
-public class IntegrationTests {
+@CucumberOptions(tags= {"@registration"},plugin= {"pretty"})
+public class CucumberIntegration {
 //Test commit
 }
