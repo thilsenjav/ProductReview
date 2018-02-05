@@ -1,6 +1,5 @@
 package com.demo.product.review.domain;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,6 +27,19 @@ public class User {
 	@Size(max=255)
 	private String password;
 	
+	public User() {
+		
+	}
+	
+	public User(Long id, String name, String email, String password) {
+		this.id = id;
+		this.name = name;
+		this.email = email;
+		this.password = password;
+	}
+
+
+
 	public Long getId() {
 		return id;
 	}

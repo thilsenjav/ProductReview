@@ -1,8 +1,9 @@
 package com.demo.product.review.controller;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
-
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class UserController {
 	UserService userService;
 
 	private static final Logger LOGGER =LoggerFactory.getLogger(UserController.class);
-	@PostMapping("/")
+	/*@PostMapping("/")
 	public ResponseEntity<?> create(@RequestBody @Valid User user){
 		long savedUserId=userService.create(user);
 		LOGGER.info("savedUserId : "+savedUserId);
@@ -41,11 +42,28 @@ public class UserController {
 		LOGGER.info("location : "+location.toString());
 		httpHeaders.setLocation(location);
 		return new ResponseEntity<String>("User registration successful",HttpStatus.OK);
+	} */
+	@PostMapping("/")
+	public ResponseEntity<?> create(@RequestBody @Valid User user,HttpServletRequest request) throws Exception{
+		long savedUserId=userService.create(user);
+		LOGGER.info("User created : savedUserId : "+savedUserId);
+		/*HttpHeaders httpHeaders=new HttpHeaders();
+		URI location =linkTo(methodOn(this.getClass()).getById(savedUserId)).toUri();
+		LOGGER.info("location : "+location.toString());
+		httpHeaders.setLocation(location);
+		*/
+		HttpHeaders headers = new HttpHeaders();
+		String uri = request.getRequestURI();
+		LOGGER.debug("uri"+uri);
+		URI location = new URI("http://localhost:8888"+uri+savedUserId);
+		headers.setLocation(location);
+		return new ResponseEntity<String>("User registration successful",headers,HttpStatus.OK);
 	} 
 
 	@GetMapping(value="/{id}")
-	public ResponseEntity<User> getById(@PathVariable long id){
+	public ResponseEntity<User> get(@PathVariable Long id){
+		User user=userService.get(id);
 		
-		return null;
+		return new ResponseEntity<User>(user,HttpStatus.OK);	 	
 	}
 }

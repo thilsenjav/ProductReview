@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.demo.product.review.controller.UserController;
 import com.demo.product.review.domain.User;
 import com.demo.product.review.repository.UserRepository;
+import com.demo.product.review.service.ServiceException;
 import com.demo.product.review.service.UserService;
 
 @Service
@@ -23,6 +24,17 @@ public class UserServiceImpl implements UserService {
 		User savedUser=userRepository.save(user);
 		LOGGER.info("service --- "+savedUser.getId());
 		return savedUser.getId();
+	}
+
+	@Override
+	public User get(Long Id) {
+		User user=userRepository.findOne(Id);
+		LOGGER.info("user service impl findOne --- "+user);
+		
+		if(null==user) {
+			throw new ServiceException("INVALID_ID","Invalid Id");
+		}
+		return user; 
 	}
 
 }
