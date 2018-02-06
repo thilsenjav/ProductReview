@@ -1,4 +1,4 @@
-package com.demo.product.review.domain;
+package com.demo.product.review.dto;
 
 public class ResponseMsg {
 

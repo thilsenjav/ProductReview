@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import com.demo.product.review.domain.ResponseMsg;
+import com.demo.product.review.dto.ResponseMsg;
 import com.demo.product.review.service.ServiceException;
 
 @ControllerAdvice

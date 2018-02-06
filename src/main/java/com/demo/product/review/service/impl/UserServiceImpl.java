@@ -3,6 +3,7 @@ package com.demo.product.review.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.demo.product.review.controller.UserController;
@@ -21,6 +22,7 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public long create(User user) {
+		user.setPassword(encryptPassword(user.getPassword()));
 		User savedUser=userRepository.save(user);
 		LOGGER.info("service --- "+savedUser.getId());
 		return savedUser.getId();
@@ -37,4 +39,10 @@ public class UserServiceImpl implements UserService {
 		return user; 
 	}
 
+	private String encryptPassword(String password) {
+		LOGGER.info("password Before encrypt: "+password);
+		String encrptedPwd=new BCryptPasswordEncoder().encode(password);
+		LOGGER.info("password After encrypt: "+encrptedPwd);
+		return encrptedPwd;
+	}
 }

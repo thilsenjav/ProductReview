@@ -4,7 +4,7 @@ Feature: register directly here
   Scenario: user enters the correct details 
     Given Web context is setup 
       And User DB is empty
-	When client requests POST /api/user/ with JSON data 
+	When client requests POST /api/user/add with JSON data 
 	"""
 	{"name":"senthil","email":"senthil@gmail.com","password":"pwd12345"}
 	"""

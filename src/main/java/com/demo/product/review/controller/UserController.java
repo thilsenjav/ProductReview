@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,7 +44,7 @@ public class UserController {
 		httpHeaders.setLocation(location);
 		return new ResponseEntity<String>("User registration successful",HttpStatus.OK);
 	} */
-	@PostMapping("/")
+	@PostMapping("/add")
 	public ResponseEntity<?> create(@RequestBody @Valid User user,HttpServletRequest request) throws Exception{
 		long savedUserId=userService.create(user);
 		LOGGER.info("User created : savedUserId : "+savedUserId);
@@ -54,12 +55,13 @@ public class UserController {
 		*/
 		HttpHeaders headers = new HttpHeaders();
 		String uri = request.getRequestURI();
-		LOGGER.debug("uri"+uri);
+		LOGGER.info("uri ------ "+uri);
 		URI location = new URI("http://localhost:8888"+uri+savedUserId);
 		headers.setLocation(location);
 		return new ResponseEntity<String>("User registration successful",headers,HttpStatus.OK);
 	} 
 
+	//@PreAuthorize("hasRole('ROLE_USER')")
 	@GetMapping(value="/{id}")
 	public ResponseEntity<User> get(@PathVariable Long id){
 		User user=userService.get(id);
