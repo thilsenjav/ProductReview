@@ -7,6 +7,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,20 +20,28 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.util.StringUtils;
 
+import com.demo.product.review.controller.UserController;
 import com.demo.product.review.dto.UserDto;
 import com.demo.product.review.service.UserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 
+	private static final Logger LOGGER =LoggerFactory.getLogger(UserController.class);
+	
 	private UserDetailsService userDetailsService;
 
 	private User principal;
-
-	public LoginFilter(String urlMapping,UserDetailsService userDetailsService,AuthenticationManager authenticationManager) {
+	private TokenAuthenticationService tokenAuthenticationService;
+	
+	private UsernamePasswordAuthenticationToken loginToken;
+	
+	public LoginFilter(String urlMapping,UserDetailsService userDetailsService,AuthenticationManager authenticationManager,TokenAuthenticationService tokenAuthenticationService) {
 		super(new AntPathRequestMatcher(urlMapping));
 		this.userDetailsService = userDetailsService;
 		this.setAuthenticationManager(authenticationManager);
+		this.tokenAuthenticationService=tokenAuthenticationService;
+		
 	}
 
 	@Override
@@ -41,11 +51,14 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 		if (user == null || StringUtils.isEmpty(user.getUserName()) || StringUtils.isEmpty(user.getPassword())) {
 		throw new AuthenticationServiceException("Cannot authenticate. Invalid data posted.");
 		}
+		
 		// Lookup the complete User object from the database and create an Authentication for it
 		principal = (User) userDetailsService.loadUserByUsername(user.getUserName());
-		final UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(
+		loginToken = new UsernamePasswordAuthenticationToken(
 		principal, user.getPassword(), principal.getAuthorities());
 		Authentication authentication = getAuthenticationManager().authenticate(loginToken);
+		LOGGER.debug("Loginfilter : attemptAuthentication : "+loginToken);
+		LOGGER.debug("Loginfilter : attemptAuthentication principal : "+principal);
 		return authentication;
 	}
 
@@ -56,9 +69,12 @@ public class LoginFilter extends AbstractAuthenticationProcessingFilter {
 		/*final UsernamePasswordAuthenticationToken loginToken = new UsernamePasswordAuthenticationToken(
 				authResult, null, authResult.getAuthorities());
 		*/
-		SecurityContextHolder.getContext().setAuthentication(authResult); 
+		LOGGER.debug("Loginfilter : successfulAuthentication : "+loginToken);
+		SecurityContextHolder.getContext().setAuthentication(loginToken); 
 		//response.addHeader("X-AUTH-TOKEN", authResult);
-	
+		
+		tokenAuthenticationService.addAuthentication(response, loginToken); // for successful login, adding headers
+		chain.doFilter(request, response);
 		
 	}
 	

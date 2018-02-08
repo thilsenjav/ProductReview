@@ -13,6 +13,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -67,5 +69,23 @@ public class UserController {
 		User user=userService.get(id);
 		
 		return new ResponseEntity<User>(user,HttpStatus.OK);	 	
+	}
+	
+	@PostMapping("/login")
+	public ResponseEntity<?> login(HttpServletRequest request) throws Exception{
+
+		Authentication authentication=SecurityContextHolder.getContext().getAuthentication();
+		org.springframework.security.core.userdetails.User user=null;
+		if(authentication==null) {
+			LOGGER.info("Anonymous user in security context------");
+			return new ResponseEntity<String>("User registration failed +",HttpStatus.UNAUTHORIZED);
+		}else {
+			user=(org.springframework.security.core.userdetails.User)authentication.getPrincipal();
+			LOGGER.info("Login : ------user name : "+user.getUsername());
+			return new ResponseEntity<String>("User registration successful for +"+user.getUsername(),HttpStatus.OK);
+		}
+		
+		
+	
 	}
 }
